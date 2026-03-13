@@ -7,12 +7,18 @@ import datetime
 # input Logic from engine.py
 from engine import extract_club_features, predict_match_result_dict
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+def get_path(relative_path):
+    """自动拼接绝对路径"""
+    return os.path.join(base_dir, relative_path)
+    
 # --- 2. DATA INITIALIZATION ---
 @st.cache_resource
 def init_all_stats():
     # load processed data and clubs for stats dict creation
-    proc_data = pd.read_csv("raw_data/processed_data.csv")
-    c_df = pd.read_csv("raw_data/clubs.csv")
+    proc_data = pd.read_csv(get_path("raw_data/processed_data.csv"))
+    c_df = pd.read_csv(get_path("clubs.csv"))
     # create stats_dict for API and Local Engine use
     stats_dict = extract_club_features(proc_data, c_df)
     return stats_dict, c_df
@@ -44,7 +50,7 @@ def get_logo_url(club_id):
 
 @st.cache_data
 def load_ui_data():
-    df = pd.read_csv("raw_data/clubs.csv")
+    df = pd.read_csv(get_path("raw_data/clubs.csv"))
     return df, sorted(df['name'].unique())
 
 clubs_df, club_names = load_ui_data()
@@ -131,9 +137,13 @@ if st.button("🚀 Predict Result", use_container_width=True):
         with st.spinner("💻 Calculating Locally..."):
             try:
                 # Load Assets Local
-                m = joblib.load("models/football_stack_reg_model.pkl")
-                p = joblib.load("models/football_pipeline.pkl")
-                proc_data = pd.read_csv("raw_data/processed_data.csv")
+                m_path = get_path("models/football_stack_reg_model.pkl")
+                p_path = get_path("models/football_pipeline.pkl")
+                d_path = get_path("raw_data/processed_data.csv")
+                
+                m = joblib.load(m_path)
+                p = joblib.load(p_path)
+                proc_data = pd.read_csv(d_path)
                 s_dict = extract_club_features(proc_data, clubs_df)
 
                 result = predict_match_result_dict(home_team, away_team, date_str,
