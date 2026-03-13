@@ -4,8 +4,19 @@ import numpy as np
 import datetime
 import os
 
-data_dir = "./raw_data/"
-clubs = pd.read_csv(os.path.join(data_dir, "clubs.csv"))
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+data_dir = os.path.join(base_dir, "raw_data")
+
+# 检查文件是否存在，防止再次报错
+clubs_path = os.path.join(data_dir, "clubs.csv")
+if not os.path.exists(clubs_path):
+    # 如果还是找不到，尝试上一级目录（兼容不同的部署结构）
+    data_dir = os.path.join(os.path.dirname(base_dir), "raw_data")
+    clubs_path = os.path.join(data_dir, "clubs.csv")
+
+clubs = pd.read_csv(clubs_path)
+# ------------------------------------
 
 def find_club(search_string, clubs_df):
     search_string_lower = search_string.lower()
