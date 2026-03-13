@@ -16,10 +16,13 @@ def get_path(relative_path):
 # --- 2. DATA INITIALIZATION ---
 @st.cache_resource
 def init_all_stats():
-    # load processed data and clubs for stats dict creation
-    proc_data = pd.read_csv(get_path("raw_data/processed_data.csv"))
-    c_df = pd.read_csv(get_path("clubs.csv"))
-    # create stats_dict for API and Local Engine use
+    # 修正：加上 raw_data/ 前缀
+    proc_data_path = get_path("raw_data/processed_data.csv")
+    clubs_path = get_path("raw_data/clubs.csv") # <--- 这里加上 raw_data/
+    
+    proc_data = pd.read_csv(proc_data_path)
+    c_df = pd.read_csv(clubs_path)
+    
     stats_dict = extract_club_features(proc_data, c_df)
     return stats_dict, c_df
 
